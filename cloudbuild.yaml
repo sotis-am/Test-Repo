@@ -1,0 +1,37 @@
+steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'decrypt .npmrc'
+  args:
+  - kms
+  - decrypt
+  - --ciphertext-file=npmrc.enc
+  - --plaintext-file=/root/.npmrc
+  - --location=global
+  - --keyring=my-keyring
+  - --key=npm-key
+  - --project=${_CLOUD_KMS_PROJECT}
+  volumes:
+    - name: 'home'
+      path: /root/
+- name: 'gcr.io/cloud-builders/npm'
+  id: 'install'
+  args: ['install']
+  env:
+  - HOME=/root/
+  volumes:
+  - name: 'home'
+    path: /root/
+- name: 'gcr.io/cloud-builders/npm'
+  id: 'test'
+  args: ['run', 'test']
+- name: gcr.io/$PROJECT_ID/skaffold:alpha
+  id: 'deploy'
+  args: ['run', '-f=${_SKAFFOLD_FILE}']
+  env:
+  - CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}
+  - CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}
+substitutions:
+    _SKAFFOLD_FILE: dummy.yaml
+    _CLOUDSDK_COMPUTE_ZONE: us-west1-a
+    _CLOUDSDK_CONTAINER_CLUSTER: dummy
+timeout: 1000s
