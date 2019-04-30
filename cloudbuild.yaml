@@ -1,29 +1,4 @@
 steps:
-- name: 'gcr.io/cloud-builders/gcloud'
-  id: 'decrypt .npmrc'
-  args:
-  - kms
-  - decrypt
-  - --ciphertext-file=npmrc.enc
-  - --plaintext-file=/root/.npmrc
-  - --location=global
-  - --keyring=my-keyring
-  - --key=npm-key
-  - --project=${_CLOUD_KMS_PROJECT}
-  volumes:
-    - name: 'home'
-      path: /root/
-- name: 'gcr.io/cloud-builders/npm'
-  id: 'install'
-  args: ['install']
-  env:
-  - HOME=/root/
-  volumes:
-  - name: 'home'
-    path: /root/
-- name: 'gcr.io/cloud-builders/npm'
-  id: 'test'
-  args: ['run', 'test']
 - name: gcr.io/$PROJECT_ID/skaffold:alpha
   id: 'deploy'
   args: ['run', '-f=${_SKAFFOLD_FILE}']
