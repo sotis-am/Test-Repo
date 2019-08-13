@@ -1,12 +1,4 @@
 steps:
-- name: gcr.io/$PROJECT_ID/skaffold:alpha
-  id: 'deploy'
-  args: ['run', '-f=${_SKAFFOLD_FILE}']
-  env:
-  - CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}
-  - CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}
-substitutions:
-    _SKAFFOLD_FILE: skaffold-dev.yaml
-    _CLOUDSDK_COMPUTE_ZONE: us-west1-a
-    _CLOUDSDK_CONTAINER_CLUSTER: skaffold
-timeout: 1000s
+- name: "gcr.io/cloud-builders/gcloud"
+  args: ["app", "deploy"]
+timeout: "1600s
